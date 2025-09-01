@@ -1,0 +1,20 @@
+# Executáveis
+*.exe
+ppmc
+
+# Arquivos temporários gerados pelos scripts
+temp.ppmc
+temp.rar
+temp.zip
+temp.7z
+temp.decomp
+*.decomp
+
+# Pastas de saída
+out/
+output/
+compress/
+descompress/
+
+# Arquivos de resultados (geralmente gerados localmente)
+*.csv
