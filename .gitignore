@@ -22,4 +22,5 @@ resultados/
 
 # Arquivos de dados grandes que não devem estar no repositório
 english_corpus.txt
+silesia.zipenglish_corpus.txt
 silesia.zip
