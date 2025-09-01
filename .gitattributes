@@ -1,2 +1,4 @@
 *.txt filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
+english_corpus.txt filter=lfs diff=lfs merge=lfs -text
+silesia.zip filter=lfs diff=lfs merge=lfs -text
