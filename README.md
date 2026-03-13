@@ -1,143 +1,100 @@
-# Compressor PPM-C com Otimização de Memória e Arquivamento
+# Sistema de Gestão APS - Saúde da Família
 
-Este repositório contém uma implementação em C++ de um compressor-descompressor de dados de alta performance baseado no algoritmo **PPM-C (Prediction by Partial Matching)**. O projeto foi otimizado para lidar com arquivos e diretórios grandes sem consumir memória excessiva, utilizando uma estrutura de dados **Trie** e técnicas de controle de memória.
+Este repositório contém uma aplicação em Python desenvolvida como Trabalho de Conclusão de Curso (TCC) para suporte e inteligência estratégica na Atenção Primária à Saúde (UFMA). O projeto foi otimizado para realizar o cruzamento de dados de pacientes (e-SUS/PEC), calcular o Risco Familiar e gerar mapas e dashboards interativos para a gestão em saúde pública.
 
 ## Funcionalidades Principais
 
-* **Compressão e Descompressão PPM-C**: Implementa o algoritmo PPM-C com um Kmax (ordem do contexto) configurável.
-* **Modelo de Trie Otimizado**: Utiliza uma árvore de prefixos (Trie) para reduzir drasticamente o consumo de RAM e permitir Kmax elevados.
-* **Gerenciamento de Memória**: Limite de nós na Trie e técnicas de escalonamento de frequência para arquivos muito grandes.
-* **Suporte a Arquivos e Diretórios**: Comprime um arquivo individual ou arquiva e comprime um diretório inteiro.
-* **Geração de Texto Probabilística**: Cria novo texto a partir de um corpus treinado, seguindo probabilidades estatísticas.
+* **Classificação de Risco Familiar**: Implementa a Escala Coelho-Savassi automatizada com base nos dados extraídos do e-SUS.
+* **Mapeamento Georreferenciado**: Utiliza mapas de calor e marcadores (Folium) para identificar áreas de vulnerabilidade (ex: alta concentração de HAS, DM ou idosos).
+* **Dashboards Interativos**: Painel analítico gerado com Matplotlib e PyQt para visualização rápida de indicadores da equipe de saúde.
+* **Sistema de Intervenções**: Gera sugestões de manejo clínico e ações de gestão baseadas no perfil epidemiológico da área.
+* **Portal de Notícias Integrado**: Feed em tempo real com as últimas atualizações e campanhas do Ministério da Saúde.
 
 ## Configuração do Ambiente
 
-O repositório contém apenas o código-fonte. Para executar os testes, você precisa dos arquivos de dados:
+O projeto exige estritamente o **Python 3.10** para garantir a compatibilidade e estabilidade das bibliotecas gráficas (PyQt5 e PyQtWebEngine) no Windows.
 
-1. **Baixe o Corpus Silesia**: [Silesia Corpus](http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia)
-2. **Crie a Pasta do Corpus**:
+1. **Crie o arquivo de dependências**: Na raiz do projeto, garanta que existe um arquivo chamado `requirements.txt` com o seguinte conteúdo:
 
-```bash
-mkdir corpus_total
+```text
+pandas<2.3
+numpy
+matplotlib
+PyQt5
+PyQtWebEngine
+folium
+branca
+requests
+beautifulsoup4
 ```
 
-3. **Extraia os Arquivos**: Descomprima `silesia.zip` para dentro da pasta `corpus_total`.
-4. **Gere o Corpus de Texto**: Execute o script Python para criar um corpus de 100MB a partir do Projeto Gutenberg.
+2. **Configure o `.gitignore`**: Para não sobrecarregar o repositório com arquivos locais, crie um arquivo `.gitignore` com:
 
-```bash
-pip install requests
-python create_corpus.py
+```text
+venv/
+__pycache__/
+*.pyc
+*.html
+.vscode/
 ```
 
-## Como Compilar
+## Como Instalar o Python 3.10
 
-Necessário um compilador C++ com suporte a **C++17**:
+Caso você não tenha o Python 3.10 ou utilize uma versão mais recente (como 3.12 ou 3.13), você pode instalá-lo lado a lado usando o gerenciador de pacotes nativo do Windows. Abra o PowerShell e execute:
 
 ```bash
-g++ -std=c++17 -O3 -o ppmc main.cpp PPMCCodec.cpp PPMCModel.cpp RangeCoder.cpp BitStream.cpp Archiver.cpp FileUtils.cpp
+winget install --id Python.Python.3.10 -e
 ```
 
-* `-std=c++17`: Define o padrão do C++.
-* `-O3`: Ativa otimização máxima.
-* `-o ppmc`: Nome do executável de saída.
+> **Aviso:** Feche o terminal e abra um novo após a instalação para que o Windows reconheça o comando.
 
 ## Guia de Comandos
 
-O programa aceita três modos principais: `c` (compressão), `d` (descompressão) e `g` (geração de texto).
+Siga a ordem abaixo no terminal (dentro da pasta do projeto) para isolar o ambiente e rodar o software sem conflitos.
 
-### 1. Compressão (c)
+### 1. Criação do Ambiente Virtual
 
-**Comprimir um Arquivo Individual:**
+**Criar a "bolha" forçando o Python 3.10:**
 
 ```bash
-./ppmc c <Kmax> <arquivo_de_entrada> <arquivo_de_saida.ppmc>
+py -3.10 -m venv venv
 ```
 
-**Exemplo:**
+### 2. Ativação do Ambiente
+
+**Ativar o ambiente (Obrigatório toda vez que for usar):**
 
 ```bash
-./ppmc c 6 ./corpus_total/dickens compress/dickens.ppmc
+.\venv\Scripts\activate
 ```
 
-**Comprimir um Diretório Inteiro:**
+> **Nota de Segurança:** Se o Windows bloquear a ativação apresentando um erro vermelho, execute o comando `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process` e tente ativar novamente. O prefixo `(venv)` deve aparecer no terminal.
+
+### 3. Instalação de Dependências
+
+**Instalar as bibliotecas do `requirements.txt`:**
 
 ```bash
-./ppmc c <Kmax> <diretorio_de_entrada> <arquivo_de_saida.ppmc>
+python -m pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-**Exemplo:**
+### 4. Execução do Sistema (GUI)
+
+**Navegar até a pasta do código e rodar o software:**
 
 ```bash
-./ppmc c 8 ./corpus_total compress/corpus_total.ppmc
-```
-
-### 2. Descompressão (d)
-
-**Descomprimir para um Arquivo:**
-
-```bash
-./ppmc d <Kmax> <arquivo_comprimido.ppmc> <arquivo_de_saida>
-```
-
-**Exemplo:**
-
-```bash
-./ppmc d 6 compress/dickens.ppmc descompress/dickens_descomprimido.txt
-```
-
-**Descomprimir para um Diretório:**
-
-> A pasta de destino deve ser criada antes.
-
-```bash
-mkdir descompress/corpus_descomprimido
-./ppmc d <Kmax> <arquivo_comprimido.ppmc> <diretorio_de_saida>
-```
-
-**Exemplo:**
-
-```bash
-./ppmc d 8 compress/corpus_total.ppmc descompress/corpus_descomprimido
-```
-
-### 3. Geração de Texto (g)
-
-```bash
-./ppmc g <Kmax> <caminho_corpus.txt> <tamanho_a_gerar> "<texto_semente>"
-```
-
-* `<Kmax>`: Kmax ótimo para o corpus (ex: 8 para `english_corpus.txt`).
-* `<caminho_corpus.txt>`: Arquivo de texto para treinar o modelo.
-* `<tamanho_a_gerar>`: Número de caracteres a serem gerados.
-* `"<texto_semente>"`: Frase inicial para contexto.
-
-**Exemplo:**
-
-```bash
-./ppmc g 8 ./english_corpus.txt 2000 "once upon a time"
-```
-
-### 4. Scripts de Teste
-
-**Comparação Rápida com WinRAR:**
-
-```bash
-./compare_winrar.sh <caminho_para_entrada> <Kmax>
-```
-
-**Exemplo:**
-
-```bash
-./compare_winrar.sh ./corpus_total/mozilla 8
+cd TCC_software
+python cerebro.py
 ```
 
 ## Estrutura do Projeto
 
-* `main.cpp`: Entrada principal, processa argumentos.
-* `PPMCCodec (.h/.cpp)`: Coordena compressão, descompressão e geração de texto.
-* `PPMCModel (.h/.cpp)`: Lógica do modelo PPM-C com Trie.
-* `RangeCoder (.h/.cpp)`: Codificador/decodificador aritmético.
-* `BitStream (.h/.cpp)`: Leitura e escrita de bits.
-* `Archiver (.h/.cpp)`: Serialização e deserialização de diretórios.
-* `FileUtils (.h/.cpp)`: Funções utilitárias de arquivos.
-* `common.h`: Constantes e includes globais.
+* `cerebro.py`: Ponto de entrada principal, coordena as janelas e o processamento em segundo plano.
+* `analise_dados.py`: Motor lógico de processamento Pandas e cálculo de risco Coelho-Savassi.
+* `widget_mapa.py`: Geração e renderização do mapa HTML interativo usando Folium e WebEngine.
+* `interface_dashboard.py`: Construção dos gráficos de pizza e KPIs dinâmicos da população.
+* `interface_intervencao.py`: Lógica de busca ativa, alertas de gestão e sugestão de manejo.
+* `interface_noticia.py`: Web scraping do portal GOV.BR e calendário de campanhas da saúde.
+* `interface_upload.py`: Tela de "Drag and Drop" para importação dos relatórios CSV do e-SUS.
+* `estilos.py`: Constantes de design e folhas de estilo CSS da interface moderna.
